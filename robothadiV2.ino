@@ -3,10 +3,10 @@
  */
 #include <Servo.h>
 
-int trigPin1 = 9;      // trig pin of HC-SR04 kiri
-int echoPin1 = 10;     // Echo pin of HC-SR04 kiri
-int trigPin2 = 11;      // trig pin of HC-SR04 kanan
-int echoPin2 = 12;     // Echo pin of HC-SR04 kanan
+int trigPin1 = 10;      // trig pin of HC-SR04 kiri
+int echoPin1 = 11;     // Echo pin of HC-SR04 kiri
+int trigPin2 = 12;      // trig pin of HC-SR04 kanan
+int echoPin2 = 13;     // Echo pin of HC-SR04 kanan
 
 int revleft4 = 4;       //REVerse motion of Left motor
 int fwdleft5 = 5;       //ForWarD motion of Left motor
@@ -32,8 +32,8 @@ void setup() {
   pinMode(trigPin2, OUTPUT);         // set trig pin as output
   pinMode(echoPin2, INPUT);          //set echo pin as input to capture reflected waves
 
-  servoL.attach(11);  
-  servoR.attach(12);
+  servoL.attach(8);  
+  servoR.attach(9);
   servoL.write(115); 
   servoR.write(115);
   delay(1000);
