@@ -1,142 +1,152 @@
-/* Obstacle Avoiding Robot Using Ultrasonic Sensor and Arduino NANO
- *  Circuit Digest(www.circuitdigest.com)
- */
-#include <Servo.h>
+#include <Servo.h> //Servo motor library
+#include <NewPing.h> //Ultrasonic sensor function library
 
-int trigPin1 = 10;      // trig pin of HC-SR04 kiri
-int echoPin1 = 11;     // Echo pin of HC-SR04 kiri
-int trigPin2 = 12;      // trig pin of HC-SR04 kanan
-int echoPin2 = 13;     // Echo pin of HC-SR04 kanan
+const int LeftForward = 5;// L298N control pins
+const int LeftBackward = 5;
+const int RightForward = 4;
+const int RightBackward = 3;
 
-int revleft4 = 4;       //REVerse motion of Left motor
-int fwdleft5 = 5;       //ForWarD motion of Left motor
-int revright6 = 6;      //REVerse motion of Right motor
-int fwdright7 = 7;      //ForWarD motion of Right motor
+#define trig_pin 10 //sensor pins - analog input 1
+#define echo_pin 11 //analog input 2
+#define trig_pin2 12 //sensor pins - analog input 1
+#define echo_pin2 13 //analog input 2
+#define maximum_distance 200
 
-long duration1, distance1, duration2, distance2;
+boolean goesForward = false;
+int distance = 100;
 
-Servo servoL;
-Servo servoR;
-
-void setup() {
-  
-  delay(random(500,2000));   // delay for random time
-  Serial.begin(9600);
-  pinMode(revleft4, OUTPUT);      // set Motor pins as output
-  pinMode(fwdleft5, OUTPUT);
-  pinMode(revright6, OUTPUT);
-  pinMode(fwdright7, OUTPUT);
-  
-  pinMode(trigPin1, OUTPUT);         // set trig pin as output
-  pinMode(echoPin1, INPUT);          //set echo pin as input to capture reflected waves
-  pinMode(trigPin2, OUTPUT);         // set trig pin as output
-  pinMode(echoPin2, INPUT);          //set echo pin as input to capture reflected waves
-
-  servoL.attach(8);  
-  servoR.attach(9);
-  servoL.write(115); 
-  servoR.write(115);
-  delay(1000);
+NewPing sonar(trig_pin, echo_pin, maximum_distance); //sensor function
+Servo servo_motor; //servo name
+Servo servo_motor2; //servo name
+void setup(){
+  pinMode(RightForward, OUTPUT);
+  pinMode(LeftForward, OUTPUT);
+  pinMode(LeftBackward, OUTPUT);
+  pinMode(RightBackward, OUTPUT);
+  servo_motor.attach(8); //servo pin
+  servo_motor2.attach(9); //servo pin
+  servo_motor.write(115);
+  servo_motor2.write(50);
+  delay(2000);
+  distance = readPing();
+  delay(100);
+  distance = readPing();
+  delay(100);
+  distance = readPing();
+  delay(100);
+  distance = readPing();
+  delay(100);
 }
 
-void loop() {
+void loop(){
+  int distanceRight = 0;
+  int distanceLeft = 0;
+  delay(50);
+   if (distance <= 20){
+    moveStop(); // obstacle probably on the route forward, so stop
+    delay(300);
+    moveBackward();
+    delay(400);
+    moveStop();
+    delay(300);
+    distanceRight = lookRight();
+    delay(300);
+    distanceLeft = lookLeft();
+    delay(300);
+    Serial.println("distance = " + distanceRight); 
 
-  digitalWrite(trigPin1, LOW);
-  digitalWrite(trigPin2, LOW);
-  delayMicroseconds(2);   
-  digitalWrite(trigPin1, HIGH);     // send waves for 10 us
-  digitalWrite(trigPin2, HIGH);     // send waves for 10 us
-  delayMicroseconds(10);
-  duration1 = pulseIn(echoPin1, HIGH); // receive reflected waves 1
-  duration2 = pulseIn(echoPin2, HIGH); // receive reflected waves 2
-  distance1 = duration1 / 58.2;   // convert to distance 1
-  distance2 = duration2 / 58.2;   // convert to distance 2
-  delay(10);
-  Serial.println("distance 1 = " + distance1);
-  Serial.println("distance 2 = " + distance2); 
-  delay(10);
-    // If you dont get proper movements of your robot then alter the pin numbers
-  if(distance1 || distance2 >=20)
- {
-    Forward();                                                     
+    if (distance >= distanceLeft){
+      turnRight(); // calculate in which direction the obstacle is more far
+      moveStop();
+    }
+    else{
+      turnLeft();
+      moveStop();
+    }
   }
-
-  if (distance1 || distance2 < 20)
-  {
-    Stop();
-    delay(200);
-    Backward();
-    delay(200);
-    Stop();
-    delay(200);
-    /////////////////////////////////////////
-    servoL.write(170); 
-    servoR.write(50); 
-    delay(500);
-    digitalWrite(trigPin1, LOW);
-    digitalWrite(trigPin2, LOW);
-    delayMicroseconds(2);   
-    digitalWrite(trigPin1, HIGH);     // send waves for 10 us
-    digitalWrite(trigPin2, HIGH);     // send waves for 10 us
-    delayMicroseconds(10);
-    duration1 = pulseIn(echoPin1, HIGH); // receive reflected waves 1
-    duration2 = pulseIn(echoPin2, HIGH); // receive reflected waves 2
-    distance1 = duration1 / 58.2;   // convert to distance 1
-    distance2 = duration2 / 58.2;   // convert to distance 2
-    delay(10);
-    Serial.println("distance 1 = " + distance1);
-    Serial.println("distance 2 = " + distance2); 
-    delay(200);
-    servoR.write(115); 
-    servoL.write(115);
-    delay(500);
-    ////////////////////////////////////////
-    
-    if(distance1 > distance2){
-      TLeft();
-      } 
-    else if(distance1 < distance2){
-      TRight();
-      }
-      else{
-      TRight();  
-      }
-    delay(500);
+  else{
+    moveForward(); 
   }
-
+    distance = readPing();
 }
 
-  void Forward(){
-    digitalWrite(fwdright7, HIGH);   // move forward
-    digitalWrite(revright6, LOW);
-    digitalWrite(fwdleft5, HIGH);                                
-    digitalWrite(revleft4, LOW);  
-  }
+int lookRight(){  
+  servo_motor.write(50);
+  servo_motor2.write(50);
+  delay(500);
+  int distance = readPing();
+  delay(100);
+  servo_motor.write(115);
+  servo_motor2.write(115);
+  return distance;
+}
 
-  void Backward(){
-    digitalWrite(fwdright7, LOW);  //movebackword         
-    digitalWrite(revright6, HIGH);
-    digitalWrite(fwdleft5, LOW);                                
-    digitalWrite(revleft4, HIGH); 
-  }
+int lookLeft(){
+  servo_motor.write(170);
+  servo_motor2.write(170);
+  delay(500);
+  int distance = readPing();
+  delay(100);
+  servo_motor.write(115);
+  servo_motor2.write(115);
+  return distance;
+  delay(100);
+}
 
-  void Stop(){
-    digitalWrite(fwdright7, LOW);  //Stop                
-    digitalWrite(revright6, LOW);
-    digitalWrite(fwdleft5, LOW);                                
-    digitalWrite(revleft4, LOW);
+int readPing(){
+  delay(70);
+  int cm = sonar.ping_cm();
+  if (cm==0){
+    cm=250;
   }
+  return cm;
+}
 
-  void TRight(){
-    digitalWrite(fwdright7, HIGH);       
-    digitalWrite(revright6, LOW);   
-    digitalWrite(revleft4, LOW);                                 
-    digitalWrite(fwdleft5, LOW); 
-    }
-    
-  void TLeft(){
-    digitalWrite(fwdright7, LOW);       
-    digitalWrite(revright6, LOW);   
-    digitalWrite(revleft4, LOW);                                 
-    digitalWrite(fwdleft5, HIGH); 
-    }
+void moveStop(){
+  digitalWrite(RightForward, LOW);
+  digitalWrite(LeftForward, LOW);
+  digitalWrite(RightBackward, LOW);
+  digitalWrite(LeftBackward, LOW);
+}
+
+void moveForward(){
+  if(!goesForward){
+    goesForward=true;
+    digitalWrite(LeftForward, HIGH);
+    digitalWrite(RightForward, HIGH);
+    digitalWrite(LeftBackward, LOW);
+    digitalWrite(RightBackward, LOW); 
+  }
+}
+
+void moveBackward(){
+  goesForward=false;
+  digitalWrite(LeftBackward, HIGH);
+  digitalWrite(RightBackward, HIGH);
+  digitalWrite(LeftForward, LOW);
+  digitalWrite(RightForward, LOW);
+}
+
+void turnRight(){
+  digitalWrite(LeftForward, HIGH);
+  digitalWrite(RightBackward, HIGH);
+  digitalWrite(LeftBackward, LOW);
+  digitalWrite(RightForward, LOW);
+  delay(500);
+  digitalWrite(LeftForward, HIGH);
+  digitalWrite(RightForward, HIGH);
+  digitalWrite(LeftBackward, LOW);
+  digitalWrite(RightBackward, LOW);
+}
+
+void turnLeft(){
+  digitalWrite(LeftBackward, HIGH);
+  digitalWrite(RightForward, HIGH);
+  digitalWrite(LeftForward, LOW);
+  digitalWrite(RightBackward, LOW);
+  delay(500);
+  digitalWrite(LeftForward, HIGH);
+  digitalWrite(RightForward, HIGH);
+  digitalWrite(LeftBackward, LOW);
+  digitalWrite(RightBackward, LOW);
+}
