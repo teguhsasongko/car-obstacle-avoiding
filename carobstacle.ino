@@ -107,42 +107,28 @@ delay (1000);
 if (distance > 20) forward();
 
 }
-////SERVO
-//int lookRight(){  
-//  servo_motor.write(50);
-//  servo_motor2.write(115);
-//  delay(500);
-//  servo_motor.write(115);
-//  servo_motor2.write(50);
-//  return distance;
-//}
-//
-//int lookLeft(){
-//  servo_motor.write(170);
-//  servo_motor2.write(115);
-//  delay(500);
-//
-//  servo_motor.write(115);
-//  servo_motor2.write(170);
-//  return distance;
-//  delay(100);
-//}
+//SERVO
+int lookRight(){  
+  servo_motor.write(50);
+  servo_motor2.write(115);
+  delay(500);
+  servo_motor.write(115);
+  servo_motor2.write(50);
+  return distance;
+}
+
+int lookLeft(){
+  servo_motor.write(170);
+  servo_motor2.write(115);
+  delay(500);
+
+  servo_motor.write(115);
+  servo_motor2.write(170);
+  return distance;
+  delay(100);
+}
 
 void revers()
-{
-// turn on motor A
-digitalWrite(in1, HIGH);
-digitalWrite(in2, LOW);
-// set speed to ntA ***No turn driving speed, motor A***
-analogWrite(enA, ntA);
-// turn on motor B
-digitalWrite(in3, HIGH);
-digitalWrite(in4, LOW);
-// set speed to ntB ***No turn driving speed, motor B***
-analogWrite(enB, ntB);
-// digitalWrite(in4, LOW);
-}
-void forward()
 {
 // turn on motor A
 digitalWrite(in1, LOW);
@@ -156,16 +142,30 @@ digitalWrite(in4, HIGH);
 analogWrite(enB, ntB);
 // digitalWrite(in4, LOW);
 }
-void turnRight()
+void forward()
 {
 // turn on motor A
 digitalWrite(in1, HIGH);
 digitalWrite(in2, LOW);
+// set speed to ntA ***No turn driving speed, motor A***
+analogWrite(enA, ntA);
+// turn on motor B
+digitalWrite(in3, HIGH);
+digitalWrite(in4, LOW);
+// set speed to ntB ***No turn driving speed, motor B***
+analogWrite(enB, ntB);
+// digitalWrite(in4, LOW);
+}
+void turnRight()
+{
+// turn on motor A
+digitalWrite(in1, LOW);
+digitalWrite(in2, HIGH);
 // set speed to ts ***Turn Speed***
 analogWrite(enA, ts);
 // turn on motor B
-digitalWrite(in3, LOW);
-digitalWrite(in4, HIGH);
+digitalWrite(in3, HIGH);
+digitalWrite(in4, LOW);
 // set speed to ts ***Turn Speed***
 analogWrite(enB, ts);
 // Turn period
@@ -177,13 +177,13 @@ digitalWrite(in4, LOW);
 void turnLeft()
 {
 // turn on motor A
-digitalWrite(in1, LOW);
-digitalWrite(in2, HIGH);
+digitalWrite(in1, HIGH);
+digitalWrite(in2, LOW);
 // set speed to ts ***Turn Speed***
 analogWrite(enA, ts);
 // turn on motor B
-digitalWrite(in3, HIGH);
-digitalWrite(in4, LOW);
+digitalWrite(in3, LOW);
+digitalWrite(in4, HIGH);
 // set speed to ts ***Turn Speed***
 analogWrite(enB, ts);
 //Turn period
