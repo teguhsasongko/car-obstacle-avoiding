@@ -36,7 +36,7 @@ const int echo2Pin = 13;
 long duration2;
 int distance2;
 
-Servo servo_motor; //our servo name
+Servo servo_motor1; //our servo name
 Servo servo_motor2; //our servo name
 
 void setup()
@@ -52,8 +52,8 @@ pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
 pinMode(echoPin, INPUT); // Sets the echoPin as an Input
 pinMode(trig2Pin, OUTPUT); // Sets the trig2Pin as an Output
 pinMode(echo2Pin, INPUT); // Sets the echo2Pin as an Input
-  servo_motor.attach(8); //our servo pin
-  servo_motor.attach(9); //our servo pin
+  servo_motor1.attach(8); //our servo pin
+  servo_motor2.attach(9); //our servo pin
 
 Serial.begin(9600); // Starts the serial communication
 }
@@ -93,9 +93,21 @@ Serial.print("Distance2: ");
 Serial.println(distance2);
 
 //driving the robot
-if (distance < 20 || distance2 < 20) { stopMotors(); delay (500); if (distance < distance2) { turnRight(); delay (1000); } if (distance > distance2)
-{ turnLeft();
-delay (1000);
+if (distance < 20 || distance2 < 20) { 
+  stopMotors(); 
+  delay (500); 
+  servo_motor1.write(0);
+  servo_motor2.write(180);
+  delay (500); 
+  servo_motor1.write(90);
+  servo_motor2.write(90);
+  delay (500); 
+  return distance;
+  if (distance < distance2) { 
+    turnRight(); delay (1000); 
+    } if (distance > distance2){ 
+      turnLeft();
+      delay (1000);
 }
 
 if (distance == distance2)
@@ -106,26 +118,6 @@ delay (1000);
 
 if (distance > 20) forward();
 
-}
-//SERVO
-int lookRight(){  
-  servo_motor.write(50);
-  servo_motor2.write(115);
-  delay(500);
-  servo_motor.write(115);
-  servo_motor2.write(50);
-  return distance;
-}
-
-int lookLeft(){
-  servo_motor.write(170);
-  servo_motor2.write(115);
-  delay(500);
-
-  servo_motor.write(115);
-  servo_motor2.write(170);
-  return distance;
-  delay(100);
 }
 
 void revers()
