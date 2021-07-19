@@ -12,9 +12,9 @@ int in4 = 3;
 // Turn speed
 int ts = 170;
 // Turn period
-int tp = 250;
+int tp = 100;
 // No turn driving speed, motor A
-int ntA = 130;
+int ntA = 155;
 // No turn driving speed, motor B
 int ntB = 155;
 
@@ -95,14 +95,12 @@ Serial.println(distance2);
 //driving the robot
 if (distance < 20 || distance2 < 20) { 
   stopMotors(); 
-  delay (500); 
   servo_motor1.write(0);
   servo_motor2.write(180);
   delay (500); 
   servo_motor1.write(90);
   servo_motor2.write(90);
   delay (500); 
-  return distance;
   if (distance < distance2) { 
     turnRight(); delay (1000); 
     } if (distance > distance2){ 
